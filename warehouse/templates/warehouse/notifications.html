@@ -1,0 +1,13 @@
+<!-- notifications.html -->
+{% extends 'warehouse/navbar.html' %}
+
+{% block content %}
+<h2>Notifications</h2>
+<ul>
+    {% for notification in notifications %}
+    <li>{{ notification.content }} - {{ notification.created_at }}</li>
+    {% empty %}
+    <li>No notifications.</li>
+    {% endfor %}
+</ul>
+{% endblock content %}

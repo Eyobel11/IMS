@@ -1,0 +1,24 @@
+{% extends "./navbar.html" %}
+{% load static %}
+{% load render_table from django_tables2 %}
+
+{% block content %}
+<div>
+        <a class="nav-link" href=' {% url "cat" %} '>back</a>
+        </div>
+ 
+<div>
+    <main>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Save Edit</button>
+        </form>
+    </main>
+    <footer>
+        <p>© 2024 MY Company</p>
+    </footer>
+       
+   
+</div>
+{% endblock content %}  

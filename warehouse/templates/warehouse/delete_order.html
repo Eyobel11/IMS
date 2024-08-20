@@ -1,0 +1,15 @@
+
+{% extends "./navbar.html" %}
+{% load static %}
+{% load render_table from django_tables2 %}
+
+{% block content %}
+  <h2>Delete Order</h2>
+  <p>Are you sure you want to delete the order "{{ order }}"?</p>
+  
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a href="{% url 'orders' %}" class="btn btn-secondary">Cancel</a>
+  </form>
+{% endblock %}

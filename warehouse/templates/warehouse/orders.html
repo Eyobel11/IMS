@@ -1,0 +1,23 @@
+
+{% include "./navbar.html" %}
+{% load static %}
+{% load render_table from django_tables2 %}
+
+{% block content %}
+
+<div class="container mt-4">
+        <form method="GET" action="{% url 'orders' %}" class="d-flex">
+                <input class="form-control me-sm-2" type="search" name="q" placeholder="Search items..." value="{{ request.GET.q }}">
+                <button class="btn btn-secondary my-2 my-sm-0" type="submit" style= "background-color : black; color:white; border: 2px solid black">Search</button>
+              </form>
+    
+    <div class="mb-3">
+        <a class="nav-link" href=' {% url "order" %} '>order item</a>
+    </div>
+
+    <div>
+        {% render_table table %}
+    </div>
+</div>
+
+{% endblock content %}
