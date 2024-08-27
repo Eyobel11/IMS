@@ -41,7 +41,6 @@ class UserRegistrationForm(UserCreationForm):
     class Meta:
         model = User
         fields = ['first_name', 'last_name', 'user_name', 'email', 'user_type', 'password1', 'password2']
-    
 
 class UserLoginForm(AuthenticationForm):
     class Meta:

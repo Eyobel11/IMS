@@ -298,7 +298,7 @@ def user_edit(request, id):
         form = UserRegistrationForm(request.POST, instance=user)
         if form.is_valid():
             form.save()
-            return redirect('warehouse/user_list')
+            return redirect('user_list')
         else:
             # Print errors to the console for debugging
             print(form.errors)
