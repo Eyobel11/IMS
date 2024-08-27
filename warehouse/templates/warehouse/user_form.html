@@ -1,0 +1,24 @@
+{% extends './base.html' %}
+
+{% block title %}{{ form_title }}{% endblock %}
+
+{% block content %}
+<h1>{{ form_title }}</h1>
+<form method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label for="{{ form.user_name.id_for_label }}" class="form-label">Username</label>
+        {{ form.user_name }}
+    </div>
+    <div class="mb-3">
+        <label for="{{ form.email.id_for_label }}" class="form-label" autocomplete="off">Email</label>
+        {{ form.email }}
+    </div>
+    <div class="mb-3">
+        <label for="{{ form.user_type.id_for_label }}" class="form-label">Role</label>
+        {{ form.user_type }}
+    </div>
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a href="{% url 'user_list' %}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}

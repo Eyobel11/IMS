@@ -3,9 +3,13 @@ from django.shortcuts import HttpResponse
 from django.template import loader
 from django_tables2 import SingleTableView
 from .tables import ordertable, stocktable, itemtable, cattable
-from .models import Item, Order, Stock, Category,Notification
+from .models import Item, Order, Stock, Category,Notification,User
 from .forms import OrderForm, AddItemForm,catForm,stockform
 from django.db.models import Q
+from django.contrib.auth import login, authenticate, logout
+from .forms import UserRegistrationForm, UserLoginForm
+from .decorators import admin_required, manager_required, staff_required
+from django.core.exceptions import PermissionDenied
 
 def home(request):
     templates = loader.get_template('warehouse/home.html')
@@ -242,9 +246,106 @@ class catView(SingleTableView):
             )
         return queryset
     
-        
+    #### register and login and logout
+    
+def register(request):
+    if request.method == 'POST':
+        form = UserRegistrationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('home')
+    else:
+        form = UserRegistrationForm()
+    return render(request, 'warehouse/register.html', {'form': form})
+
+def user_login(request):
+    if request.method == 'POST':
+        form = UserLoginForm(request, data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            return redirect('home')
+    else:
+        form = UserLoginForm()
+    return render(request, 'warehouse/login.html', {'form': form})
+
+def user_logout(request):
+    logout(request)
+    return redirect('login')
+
+
+############# edit the user  forget the user_add for now
+
+def user_list(request):
+    users = User.objects.all()
+    return render(request, 'warehouse/user_list.html', {'users': users})
+
+def user_add(request):
+
+    if request.method == 'POST':
+        form = UserRegistrationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('user_list')
+    else:
+        form = UserRegistrationForm()
+    return render(request, 'warehouse/user_form.html', {'form': form, 'form_title': 'Add User'})
+
+def user_edit(request, id):
+    user = get_object_or_404(User, id=id)
+    if request.method == 'POST':
+        form = UserRegistrationForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            return redirect('warehouse/user_list')
+        else:
+            # Print errors to the console for debugging
+            print(form.errors)
+    else:
+        form = UserRegistrationForm(instance=user)
+    return render(request, 'warehouse/user_form.html', {'form': form, 'form_title': 'Edit User'})
+
+
+def user_delete(request, id):
+    user = get_object_or_404(User, id=id)
+    if request.method == 'POST':
+        user.delete()
+        return redirect('user_list')
+    return render(request, 'warehouse/delete_user.html', {'user': user})
+
+################################ this is for the roles
 
 
 
+@admin_required
+def admin_view(request):
+    # Logic for admin-only view
+    return render(request, 'admin_page.html')
+
+@manager_required
+def manager_view(request):
+    # Logic for manager-only view
+    return render(request, 'manager_page.html')
+
+@staff_required
+def staff_view(request):
+    # Logic for staff-only view
+    return render(request, 'staff_page.html')
+
+def user_is_admin(user):
+    if user.is_authenticated and user.user_type == 'admin':
+        return True
+    raise PermissionDenied
+
+def user_is_manager(user):
+    if user.is_authenticated and user.user_type == 'manager':
+        return True
+    raise PermissionDenied
+
+def user_is_staff(user):
+    if user.is_authenticated and user.user_type == 'staff':
+        return True
+    raise PermissionDenied
 
 

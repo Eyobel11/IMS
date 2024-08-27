@@ -20,7 +20,16 @@ urlpatterns = [
     path('catagory/edit/<int:order_id>/', views.catagory_edit, name='catagory_edit'),
     path('catagory/delete/<int:order_id>/', views.delete_catagory, name='delete_catagory'),
     path('notifications/', views.notification_list, name='notifications'),
-    
+  
+    path('register/', views.register, name='register'),
+    path('login/', views.user_login, name='login'),
+    path('logout/', views.user_logout, name='logout'),
+
+
+    path('users/', views.user_list, name='user_list'),
+    path('users/add/', views.user_add, name='user_add'),
+    path('users/edit/<int:id>/', views.user_edit, name='user_edit'),
+    path('users/delete/<int:id>/', views.user_delete, name='user_delete'),
     
 
 ]

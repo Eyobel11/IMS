@@ -1,5 +1,6 @@
 from django import forms
-from .models import Item, Order,Stock, Category
+from .models import Item, Order,Stock, Category,User
+from django.contrib.auth.forms import UserCreationForm,AuthenticationForm
 
 class OrderForm(forms.ModelForm):
     class Meta:
@@ -36,3 +37,13 @@ class stockform(forms.ModelForm):
         fields = ['current_level','stock_no','description','category']
 
    
+class UserRegistrationForm(UserCreationForm):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'user_name', 'email', 'user_type', 'password1', 'password2']
+    
+
+class UserLoginForm(AuthenticationForm):
+    class Meta:
+        model = User
+        fields = ['user_name', 'password']

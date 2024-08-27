@@ -9,6 +9,7 @@ user_type = [
     ('Manager', "manager"),
     ('Registeror', "registeror"),
     ('Engineer', "Engineer"),
+    ('Staff', "staff"),
     ('Admin', "Admin"),
     ('Other', "Other"),
 ]
