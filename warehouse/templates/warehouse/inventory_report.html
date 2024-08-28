@@ -1,0 +1,41 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Report</title>
+</head>
+<body>
+    <header>
+        <h1>Inventory Report</h1>
+    </header>
+    
+    <section>
+        <table>
+            <thead>
+                <tr>
+                    <th>Stock No</th>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th>Current Level</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for stock in stocks %}
+                <tr>
+                    <td>{{ stock.stock_no }}</td>
+                    <td>{{ stock.category.name }}</td>
+                    <td>{{ stock.description }}</td>
+                    <td>{{ stock.current_level }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+    
+    <footer>
+        <p>Generated on: {{ current_date }}</p>
+    </footer>
+</body>
+</html>

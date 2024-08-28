@@ -3,11 +3,163 @@
 
 {% block content %}
 <h2>Notifications</h2>
-<ul>
-    {% for notification in notifications %}
-    <li>{{ notification.content }} - {{ notification.created_at }}</li>
-    {% empty %}
-    <li>No notifications.</li>
-    {% endfor %}
-</ul>
+<section>
+    <li class="nav-item dropdown">
+                    <a class="nav-link position-relative" data-toggle="dropdown" href="#" id="notificationsDropdown" aria-haspopup="true" aria-expanded="false">
+                        <div style="font-size: 24px; color: #3498db; position: relative;">
+                            <i class="far fa-bell"></i>
+                            {% if notifications|length|gt:0 %}
+                            <span style="position: absolute; top: -5px; right: -10px; font-size: 14px; color: white; background-color: #3498db; border-radius: 50%; padding: 3px 7px;" class="badge">
+                                {{ notifications|length }}
+                            </span>
+                            {% endif %}
+                        </div>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" aria-labelledby="notificationsDropdown">
+                        <span class="dropdown-item dropdown-header">
+                            Notifications ({{ notifications|length }})
+                        </span>
+                        <div class="dropdown-divider"></div>
+                
+                        {% if notifications %}
+                            {% for notification in notifications %}
+                                <a class="dropdown-item d-flex align-items-center notification-item" 
+                                href="#" data-id="{{ notification.id }}">
+                                    <div>
+                                        <strong>{{ notification.message }}</strong>
+                                        <span class="text-muted">{{ notification.notification_date|date }}</span>
+                                    </div>
+                                </a>
+                                <div class="dropdown-divider"></div>
+                            {% endfor %}
+                        {% else %}
+                            <a class="dropdown-item d-flex align-items-center" href="#">
+                                No new notifications
+                            </a>
+                        {% endif %}
+                    </div>
+                </li>
+                
+</section>
 {% endblock content %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Function to mark notification as read
+        function markNotificationAsRead(notificationId, element) {
+            // Immediately remove the notification from the list
+            element.style.display = 'none';
+            // Update the notification count
+            updateNotificationCount(-1);
+            
+            // Send AJAX request to mark notification as read
+            fetch("{% url 'mark_notification_as_read' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: `notification_id=${notificationId}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    console.log('Notification marked as read');
+                } else {
+                    console.error('Error:', data.message);
+                    // If there is an error, revert the removal
+                    element.style.display = 'block';
+                    updateNotificationCount(1);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // If there is an error, revert the removal
+                element.style.display = 'block';
+                updateNotificationCount(1);
+            });
+        }
+    
+        // Function to update the notification count
+        function updateNotificationCount(change) {
+            const notificationCount = document.querySelector('.badge');
+            let currentCount = parseInt(notificationCount.innerHTML);
+            currentCount += change;
+            notificationCount.innerHTML = currentCount;
+        }
+    
+        // Add click event listeners to notification items
+        function addClickEventListeners() {
+            const notificationItems = document.querySelectorAll('.notification-item');
+            notificationItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const notificationId = this.getAttribute('data-id');
+                    markNotificationAsRead(notificationId, this);
+                });
+            });
+        }
+    
+        // Function to fetch and update notifications
+        function fetchNotifications() {
+            console.log('Fetching notifications...');
+            fetch("{% url 'fetch_notifications' %}", {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Notifications fetched:', data);
+                const notificationsContainer = document.querySelector('.dropdown-menu[aria-labelledby="notificationsDropdown"]');
+                const notificationCount = document.querySelector('.badge');
+                notificationsContainer.innerHTML = ''; // Clear existing notifications
+    
+                // Update notification count
+                notificationCount.innerHTML = data.notifications.length;
+    
+                // Add header and divider
+                notificationsContainer.innerHTML += `
+                     {% comment %} <span class="dropdown-item dropdown-header">
+                        Notifications ($\{data.notifications.length})
+                    </span>  {% endcomment %}
+                    <div class="dropdown-divider"></div>
+                `;
+    
+                // Add notifications to the dropdown
+                if (data.notifications.length > 0) {
+                    data.notifications.forEach(notification => {
+                        const notificationElement = document.createElement('a');
+                        notificationElement.className = 'dropdown-item d-flex align-items-center notification-item';
+                        notificationElement.setAttribute('data-id', notification.id);
+                        notificationElement.href = '#';
+                        notificationElement.innerHTML = `
+                            <div>
+                                <strong>${notification.message}</strong>
+                                <span class="text-muted">${notification.notification_date}</span>
+                            </div>
+                        `;
+                        notificationsContainer.appendChild(notificationElement);
+                        notificationsContainer.innerHTML += '<div class="dropdown-divider"></div>';
+                    });
+                } else {
+                    notificationsContainer.innerHTML += `
+                        <a class="dropdown-item d-flex align-items-center" href="#">
+                            No new notifications
+                        </a>
+                    `;
+                }
+    
+                // Re-add click event listeners
+                addClickEventListeners();
+            })
+            .catch(error => console.error('Error fetching notifications:', error));
+        }
+    
+        // Initial fetch and set interval for every 2 minutes (120000 milliseconds)
+        fetchNotifications();
+        setInterval(fetchNotifications, 120000);
+    });
+</script>

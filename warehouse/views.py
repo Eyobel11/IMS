@@ -10,6 +10,7 @@ from django.contrib.auth import login, authenticate, logout
 from .forms import UserRegistrationForm, UserLoginForm
 from .decorators import admin_required, manager_required, staff_required
 from django.core.exceptions import PermissionDenied
+from django.views.decorators.csrf import csrf_exempt
 
 def home(request):
     templates = loader.get_template('warehouse/home.html')
@@ -161,16 +162,19 @@ def delete_catagory(request,order_id):
     
      return render(request, 'warehouse/delete_catagory.html', {'order': order})
 
-def notification_list(request):
-    notifications = request.user.notifications.filter(is_read=False)
-    return render(request, 'warehouse/notifications.html', {'notifications': notifications})
-# views.py
+# @login_required
 
-def notification_list(request):
-    notifications = request.user.notifications.filter(is_read=False)
-    notifications.update(is_read=True)
-    return render(request, 'warehouse/notifications.html', {'notifications': notifications})
+# def notification_list(request):
+#     notifications = request.user.notifications.filter(is_read=False).order_by('-created_at')
+#     return render(request, 'warehouse/notifications.html', {'notifications': notifications})
 
+# # @login_required
+
+# def mark_as_read(request, notification_id):
+#     notification = Notification.objects.get(id=notification_id, user=request.user)
+#     notification.is_read = True
+#     notification.save()
+#     return redirect('notifications')
 
 
 
@@ -349,3 +353,44 @@ def user_is_staff(user):
     raise PermissionDenied
 
 
+#### report 
+
+# @staff_required
+
+def inventory_report(request):
+    stocks = Stock.objects.all()
+    return render(request, 'warehouse/inventory_report.html', {'stocks': stocks})
+
+def order_history_report(request):
+    orders = Order.objects.all().order_by('-order_date')
+    return render(request, 'warehouse/order_history_report.html', {'orders': orders})
+
+
+from django.http import JsonResponse
+
+def fetch_notifications(request):
+    notifications = Notification.objects.filter(read=False,user=request.user)  # Adjust the queryset as needed
+    notifications_data = []
+    for notification in notifications:
+        notifications_data.append({
+            'id': notification.id,
+            'message': notification.message,
+            'notification_date': notification.notification_date.strftime('%Y-%m-%d'),
+            'read': notification.read,
+        })
+    return JsonResponse({'notifications': notifications_data})
+
+
+@csrf_exempt 
+
+def mark_notification_as_read(request):
+    if request.method == 'POST':
+        notification_id = request.POST.get('notification_id')
+        try:
+            notification = Notification.objects.get(id=notification_id)
+            notification.read = True
+            notification.save()
+            return JsonResponse({'status': 'success'})
+        except Notification.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Notification not found'})
+    return JsonResponse({'status': 'error', 'message': 'Invalid request'})

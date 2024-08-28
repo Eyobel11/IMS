@@ -19,7 +19,7 @@ urlpatterns = [
     path('stocks/delete/<int:order_id>/', views.stock_delete, name='stock_delete'),
     path('catagory/edit/<int:order_id>/', views.catagory_edit, name='catagory_edit'),
     path('catagory/delete/<int:order_id>/', views.delete_catagory, name='delete_catagory'),
-    path('notifications/', views.notification_list, name='notifications'),
+    
   
     path('register/', views.register, name='register'),
     path('login/', views.user_login, name='login'),
@@ -31,5 +31,16 @@ urlpatterns = [
     path('users/edit/<int:id>/', views.user_edit, name='user_edit'),
     path('users/delete/<int:id>/', views.user_delete, name='user_delete'),
     
+   
+    path('inventory_report/', views.inventory_report, name='inventory_report'),
+    path('order_history_report/', views.order_history_report, name='order_history_report'),
+   
+    
+    # path('notifications/', views.notification_list, name='notifications'),
+    # path('notifications/mark-as-read/<int:notification_id>/', views.mark_as_read, name='mark_as_read'),
+
+
+     path('mark_notification_as_read/', views.mark_notification_as_read, name='mark_notification_as_read'),
+     path('fetch-notifications/', views.fetch_notifications, name='fetch_notifications'),
 
 ]

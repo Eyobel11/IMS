@@ -1,39 +1,61 @@
-# from django.db.models.signals import post_save
-# from django.dispatch import receiver
-# from .models import Order,Stock,Item
-
-# @receiver(post_save, sender=Order)
-# def update_stock_on_order_shipment(sender, instance, **kwargs):
-#     if instance.status == 'shipped':
-#         stock = instance.item.stock
-#         stock.current_level += instance.quantity
-#         stock.save()
-# signals.py
-from django.db.models.signals import post_save, pre_delete
+# warehouse/signals.py
+from django.db.models.signals import post_save
 from django.dispatch import receiver
-from .models import User, Item, Stock, Category, Notification
+from .models import*
 
-@receiver(post_save, sender=User)
-def notify_user_change(sender, instance, created, **kwargs):
-    if created:
-        content = f"A new user '{instance.user_name}' has been created."
+# signals.py
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from .models import User, Category, Stock, Item, Order, MaterialRequest, Notification
+
+@receiver(post_save)
+def create_notification(sender, instance, created, **kwargs):
+    if sender in [User, Category, Stock, Item, Order, MaterialRequest]:
+        action = "created" if created else "updated"
+        message = f"A {sender.__name__.lower()} has been {action}: {instance}"
+
+        users = User.objects.filter(is_active=True)
+        for user in users:
+            if user.is_superuser:
+                Notification.objects.create(
+                    user=user,
+                    message=message,
+                    notification_date=timezone.now(),
+                    notification_type=sender.__name__
+                )
+            elif user.user_type == 'Registeror' and sender.__name__ != 'User':
+                Notification.objects.create(
+                    user=user,
+                    message=message,
+                    notification_date=timezone.now(),
+                    notification_type=sender.__name__
+                )
+            elif user.user_type == 'Engineer' and sender.__name__ == 'MaterialRequest':
+                Notification.objects.create(
+                    user=user,
+                    message=message,
+                    notification_date=timezone.now(),
+                    notification_type=sender.__name__
+                )
+
+@receiver(post_save, sender=Order)
+def update_stock_on_order(sender, instance, **kwargs):
+    if instance.status == 'shipped':
+        stock = instance.stock
+        stock.current_level += instance.quantity
+        stock.save()
+
+
+@receiver(post_save, sender=MaterialRequest)
+def update_stock_on_request(sender, instance, **kwargs):
+    item=instance.item
+    stock = item.stock
+    if instance.status == 'issued':
+        
+        stock.current_level -= 1
+    elif instance.status == 'returned':
+        stock.current_level += 1
     else:
-        content = f"User '{instance.user_name}' has been updated."
-    
-    Notification.objects.create(user=instance, content=content)
-
-@receiver(post_save, sender=Item)
-def notify_item_change(sender, instance, created, **kwargs):
-    content = f"Item '{instance.name}' has been {'created' if created else 'updated'}."
-    Notification.objects.create(user=instance.stock.category.stocks.first().category.stocks.first().user, content=content)
-
-@receiver(post_save, sender=Stock)
-def notify_stock_change(sender, instance, created, **kwargs):
-    content = f"Stock '{instance.stock_no}' has been {'created' if created else 'updated'}."
-    for item in instance.items.all():
-        Notification.objects.create(user=item.stock.category.stocks.first().category.stocks.first().user, content=content)
-
-@receiver(post_save, sender=Category)
-def notify_category_change(sender, instance, created, **kwargs):
-    content = f"Category '{instance.name}' has been {'created' if created else 'updated'}."
-    Notification.objects.create(user=instance.stocks.first().category.stocks.first().user, content=content)
+        None    
+        
+    stock.save()
