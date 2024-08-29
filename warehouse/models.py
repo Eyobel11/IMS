@@ -7,8 +7,6 @@ from django.urls import reverse, reverse_lazy
 
 user_type = [
     ('Manager', "manager"),
-    ('Registeror', "registeror"),
-    ('Engineer', "Engineer"),
     ('Staff', "staff"),
     ('Admin', "Admin"),
     ('Other', "Other"),
@@ -25,7 +23,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=254, unique=True)
     user_name = models.CharField(max_length=200, unique=True)
     password = models.CharField(max_length=200)
-    user_type = models.CharField(choices=user_type, default="Engineer", max_length=20)
+    user_type = models.CharField(choices=user_type, default="Staff", max_length=20)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
@@ -110,7 +108,7 @@ class MaterialRequest(models.Model):
         return f"Request {self.id} by {self.user.user_name}"
 
 
-# models.py
+
 
 class Notification(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

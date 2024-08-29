@@ -12,13 +12,20 @@ from .decorators import admin_required, manager_required, staff_required
 from django.core.exceptions import PermissionDenied
 from django.views.decorators.csrf import csrf_exempt
 
-def home(request):
-    templates = loader.get_template('warehouse/home.html')
+#home view
 
+def home(request):
+
+    templates = loader.get_template('warehouse/home.html')
     return HttpResponse(templates.render({},request))
 
-from django.shortcuts import render
+def permission(request):
+       templates = loader.get_template('warehouse/403.html')
+       return HttpResponse(templates.render({},request))
 
+#item management views
+
+@staff_required
 
 def add_item(request):
     if request.method == 'POST':
@@ -29,6 +36,8 @@ def add_item(request):
           
     
     return render(request, 'warehouse/item.html', {'form': AddItemForm()})  
+
+@staff_required
 
 def item_edit(request, order_id):
     order = get_object_or_404(Item, pk=order_id)
@@ -42,6 +51,8 @@ def item_edit(request, order_id):
     
     return render(request, 'warehouse/edit_item.html', {'form': form})
 
+@staff_required
+
 def item_delete(request,order_id):
      
      order = get_object_or_404(Item, id=order_id)  # Get the specific order by ID
@@ -52,7 +63,9 @@ def item_delete(request,order_id):
      
      return render(request, 'warehouse/delete_item.html', {'order': order})
 
+#order managment views
 
+@staff_required
 
 def order_item(request):
     if request.method == 'POST':
@@ -66,6 +79,7 @@ def order_item(request):
     
     return render(request, 'warehouse/order.html', {'form': form})
 
+@staff_required
 
 def edit(request, order_id):
     order = get_object_or_404(Order, id=order_id)  # Get the specific order by ID
@@ -80,6 +94,8 @@ def edit(request, order_id):
     
     return render(request, 'warehouse/edit_order.html', {'form': form})
 
+@staff_required
+
 def delete_order(request, order_id):
     order = get_object_or_404(Order, id=order_id)  # Get the specific order by ID
     
@@ -90,7 +106,10 @@ def delete_order(request, order_id):
     return render(request, 'warehouse/delete_order.html', {'order': order})
 
 
+#stock management views
 
+
+@manager_required
 
 def add_stock(request):
     if request.method == 'POST':
@@ -101,6 +120,7 @@ def add_stock(request):
    
     return render(request, 'warehouse/stock.html', {'form': stockform()})
 
+@manager_required
 
 def stock_edit(request,order_id):
 
@@ -116,6 +136,8 @@ def stock_edit(request,order_id):
     
     return render(request, 'warehouse/edit_stock.html', {'form': form})
 
+@manager_required
+
 def stock_delete(request,order_id):
     
      order = get_object_or_404(Stock, id=order_id)  # Get the specific order by ID
@@ -127,6 +149,9 @@ def stock_delete(request,order_id):
      return render(request, 'warehouse/delete_stock.html', {'order': order})
 
     
+# category management views
+
+@admin_required
 
 def add_catagory(request):
     if request.method == 'POST':
@@ -137,6 +162,8 @@ def add_catagory(request):
           
     
     return render(request, 'warehouse/add_catagory.html', {'form': catForm()})  
+
+@manager_required
 
 def catagory_edit(request, order_id):
     
@@ -151,6 +178,8 @@ def catagory_edit(request, order_id):
         form = catForm(instance=order)  # Load the form with the current order data
     
     return render(request, 'warehouse/edit_catagory.html', {'form': form})
+
+@manager_required
 
 def delete_catagory(request,order_id):
 
@@ -281,9 +310,15 @@ def user_logout(request):
 
 ############# edit the user  forget the user_add for now
 
+#user management views
+
+@admin_required
+
 def user_list(request):
     users = User.objects.all()
     return render(request, 'warehouse/user_list.html', {'users': users})
+
+@admin_required
 
 def user_add(request):
 
@@ -295,6 +330,8 @@ def user_add(request):
     else:
         form = UserRegistrationForm()
     return render(request, 'warehouse/user_form.html', {'form': form, 'form_title': 'Add User'})
+
+@admin_required
 
 def user_edit(request, id):
     user = get_object_or_404(User, id=id)
@@ -310,6 +347,7 @@ def user_edit(request, id):
         form = UserRegistrationForm(instance=user)
     return render(request, 'warehouse/user_form.html', {'form': form, 'form_title': 'Edit User'})
 
+@admin_required
 
 def user_delete(request, id):
     user = get_object_or_404(User, id=id)
@@ -322,44 +360,19 @@ def user_delete(request, id):
 
 
 
-@admin_required
-def admin_view(request):
-    # Logic for admin-only view
-    return render(request, 'admin_page.html')
-
-@manager_required
-def manager_view(request):
-    # Logic for manager-only view
-    return render(request, 'manager_page.html')
-
-@staff_required
-def staff_view(request):
-    # Logic for staff-only view
-    return render(request, 'staff_page.html')
-
-def user_is_admin(user):
-    if user.is_authenticated and user.user_type == 'admin':
-        return True
-    raise PermissionDenied
-
-def user_is_manager(user):
-    if user.is_authenticated and user.user_type == 'manager':
-        return True
-    raise PermissionDenied
-
-def user_is_staff(user):
-    if user.is_authenticated and user.user_type == 'staff':
-        return True
-    raise PermissionDenied
 
 
 #### report 
 
 # @staff_required
 
+@admin_required
+
 def inventory_report(request):
     stocks = Stock.objects.all()
     return render(request, 'warehouse/inventory_report.html', {'stocks': stocks})
+
+@admin_required
 
 def order_history_report(request):
     orders = Order.objects.all().order_by('-order_date')
