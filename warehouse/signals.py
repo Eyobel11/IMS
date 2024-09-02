@@ -39,23 +39,21 @@ def create_notification(sender, instance, created, **kwargs):
                 )
 
 @receiver(post_save, sender=Order)
-def update_stock_on_order(sender, instance, **kwargs):
+def update_stock_on_order_shipment(sender, instance, **kwargs):
     if instance.status == 'shipped':
-        stock = instance.stock
+        stock = instance.item.stock
         stock.current_level += instance.quantity
         stock.save()
 
 
+# signals.py
+
 @receiver(post_save, sender=MaterialRequest)
 def update_stock_on_request(sender, instance, **kwargs):
-    item=instance.item
+    item = instance.item
     stock = item.stock
-    if instance.status == 'issued':
-        
-        stock.current_level -= 1
-    elif instance.status == 'returned':
-        stock.current_level += 1
-    else:
-        None    
-        
-    stock.save()
+    if instance.status == 'approved':
+        stock.current_level -= instance.quantity_requested
+        stock.save()
+    elif instance.status == 'rejected':
+        pass  # Optionally handle rejected requests differently

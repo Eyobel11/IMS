@@ -2,20 +2,21 @@ from django.shortcuts import get_object_or_404, render,redirect
 from django.shortcuts import HttpResponse
 from django.template import loader
 from django_tables2 import SingleTableView
-from .tables import ordertable, stocktable, itemtable, cattable
-from .models import Item, Order, Stock, Category,Notification,User
-from .forms import OrderForm, AddItemForm,catForm,stockform
+from .tables import ordertable, stocktable, itemtable, cattable,MaterialRequesttable
+from .models import Item, Order, Stock, Category,Notification,User,MaterialRequest
+from .forms import OrderForm, AddItemForm,catForm,stockform,EditmaterialrequestForm,materialrequestForm
 from django.db.models import Q
 from django.contrib.auth import login, authenticate, logout
 from .forms import UserRegistrationForm, UserLoginForm
 from .decorators import admin_required, manager_required, staff_required
 from django.core.exceptions import PermissionDenied
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
 
 #home view
 
 def home(request):
-
+    
     templates = loader.get_template('warehouse/home.html')
     return HttpResponse(templates.render({},request))
 
@@ -65,7 +66,7 @@ def item_delete(request,order_id):
 
 #order managment views
 
-@staff_required
+@manager_required
 
 def order_item(request):
     if request.method == 'POST':
@@ -79,7 +80,7 @@ def order_item(request):
     
     return render(request, 'warehouse/order.html', {'form': form})
 
-@staff_required
+@manager_required
 
 def edit(request, order_id):
     order = get_object_or_404(Order, id=order_id)  # Get the specific order by ID
@@ -94,7 +95,7 @@ def edit(request, order_id):
     
     return render(request, 'warehouse/edit_order.html', {'form': form})
 
-@staff_required
+@manager_required
 
 def delete_order(request, order_id):
     order = get_object_or_404(Order, id=order_id)  # Get the specific order by ID
@@ -407,3 +408,67 @@ def mark_notification_as_read(request):
         except Notification.DoesNotExist:
             return JsonResponse({'status': 'error', 'message': 'Notification not found'})
     return JsonResponse({'status': 'error', 'message': 'Invalid request'})
+
+
+########## materials #####
+@staff_required
+
+def material_requests(request):
+    if request.method == 'POST':
+        form = materialrequestForm(request.POST)
+        if form.is_valid():
+            material_request = form.save(commit=False)
+            material_request.user = request.user  # Assign the current user to the request
+            material_request.save()
+
+           # messages.success(request, 'Material request submitted successfully!')
+            return redirect('MaterialRequestview')  # Ensure this URL name matches your URL pattern
+    else:
+        form = materialrequestForm()
+
+    return render(request, 'warehouse/MaterialRequest.html', {'form': form})
+
+def MaterialRequests(request):
+    if request.method == 'POST':
+        form = materialrequestForm(request.POST)
+        if form.is_valid():
+            form.save()
+            
+            return redirect('MaterialRequestview')  
+    else:
+        form = materialrequestForm()
+    
+    return render(request, 'warehouse/MaterialRequest.html', {'form': form})
+
+class MaterialRequestview(SingleTableView):
+    
+    model = MaterialRequest
+    table_class = MaterialRequesttable
+    template_name = 'warehouse/material_request_list.html'
+
+    def get_queryset(self):
+        return super().get_queryset().order_by('-request_date')
+    
+
+
+@manager_required
+
+def editstatus(request, id):
+    # Retrieve the material request object or return a 404 error if not found
+    material_request = get_object_or_404(MaterialRequest, id=id)
+    
+    if request.method == 'POST':
+        # Initialize the form with POST data and the instance to be updated
+        form = EditmaterialrequestForm(request.POST, instance=material_request)
+        if form.is_valid():
+            form.save()
+            # Redirect to the material request list view or another relevant view
+            return redirect('MaterialRequestview')  # Ensure this URL name matches your URL pattern
+    else:
+        # Initialize the form with the instance to be edited for GET requests
+        form = EditmaterialrequestForm(instance=material_request)
+    
+    # Render the template with the form
+    return render(request, 'warehouse/materialrequest.html', {'form': form})
+
+

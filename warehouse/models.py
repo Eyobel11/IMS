@@ -98,17 +98,6 @@ class Order(models.Model):
     def __str__(self):
         return f"Order {self.id} - {self.item.name}"
 
-class MaterialRequest(models.Model):
-    request_date = models.DateField()
-    status = models.CharField(max_length=50)
-    item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='material_requests')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='material_requests')
-
-    def __str__(self):
-        return f"Request {self.id} by {self.user.user_name}"
-
-
-
 
 class Notification(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -127,3 +116,17 @@ class Notification(models.Model):
     def __str__(self):
         return f"Notification for {self.user.user_name} - {self.notification_date}"
 
+class MaterialRequest(models.Model):
+    STATUS_CHOICES = (
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    )
+    request_date = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='material_requests')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='material_requests')
+    quantity_requested = models.PositiveIntegerField()
+
+    def __str__(self):
+        return f"Request {self.id} by {self.user.user_name}"

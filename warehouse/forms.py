@@ -1,5 +1,5 @@
 from django import forms
-from .models import Item, Order,Stock, Category,User
+from .models import Item, Order,Stock, Category,User,MaterialRequest
 from django.contrib.auth.forms import UserCreationForm,AuthenticationForm
 
 class OrderForm(forms.ModelForm):
@@ -46,3 +46,13 @@ class UserLoginForm(AuthenticationForm):
     class Meta:
         model = User
         fields = ['user_name', 'password']
+        
+class materialrequestForm(forms.ModelForm):
+    class Meta:
+        model = MaterialRequest
+        fields = ['quantity_requested','item']
+
+class EditmaterialrequestForm(forms.ModelForm):
+    class Meta:
+        model = MaterialRequest
+        fields = ['status']

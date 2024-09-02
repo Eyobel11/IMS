@@ -1,6 +1,6 @@
 import django_tables2 as tables
 from django.urls import reverse
-from .models import Order, Stock, Category,Item
+from .models import Order, Stock, Category,Item,MaterialRequest
 
 
 class ordertable(tables.Table):
@@ -78,3 +78,20 @@ class cattable(tables.Table):
         model= Category
         template_name = "django_tables2/bootstrap.html"
         fields = ("name","description","edit_link","delete_link")
+
+
+class MaterialRequesttable(tables.Table):
+        edit_link = tables.LinkColumn(
+        viewname='editstatus',  
+        args=[tables.A('pk')], 
+        text='edit',  
+        empty_values=(),  
+    )
+        
+        user = tables.Column(accessor='user.user_name')
+    
+        class Meta:
+         
+         model= MaterialRequest
+         template_name = "django_tables2/bootstrap.html"
+         fields = ("user","item","quantity_requested","status","request_date","edit_link")

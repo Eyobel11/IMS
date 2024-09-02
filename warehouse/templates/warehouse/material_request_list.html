@@ -1,0 +1,18 @@
+{% extends "./navbar.html" %}
+{% load static %}
+
+
+{% load render_table from django_tables2 %}
+
+{% block content %}
+<div>
+        <a class="nav-link" href=' {% url "MaterialRequest" %} '>make request</a>
+        </div>
+ 
+<div>
+        <table class="table table-sm">
+                {% render_table table %}
+              </table>
+        
+</div>
+{% endblock content %}

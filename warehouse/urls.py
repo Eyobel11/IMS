@@ -43,4 +43,11 @@ urlpatterns = [
      path('mark_notification_as_read/', views.mark_notification_as_read, name='mark_notification_as_read'),
      path('fetch-notifications/', views.fetch_notifications, name='fetch_notifications'),
 
+
+    path('MaterialRequest/', views.material_requests, name='MaterialRequest'),
+    path('MaterialRequestview/', views.MaterialRequestview.as_view(), name='MaterialRequestview'),
+    path('editstatus/<int:id>/', views.editstatus, name='editstatus'),
+
+
+
 ]
