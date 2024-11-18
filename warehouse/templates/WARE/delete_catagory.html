@@ -1,0 +1,33 @@
+
+{% extends "./navbar.html" %}
+{% load static %}
+{% load render_table from django_tables2 %}
+
+{% block content %}
+  <h2>Delete Order</h2>
+  <p>Are you sure you want to delete the catagory "{{ order }}"?</p>
+  
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a href="{% url 'orders' %}" class="btn btn-secondary">Cancel</a>
+  </form>
+
+  {% if success %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        Swal.fire({
+            icon: 'success',
+            title: 'Category deleted successfully!',
+            showConfirmButton: true,
+            confirmButtonText: 'Okay'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "{% url 'cat' %}";
+            }
+        });
+    });
+</script>
+{% endif %}
+
+{% endblock %}

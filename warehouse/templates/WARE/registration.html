@@ -1,0 +1,170 @@
+{% extends "./navbar.html" %}
+{% load static %}
+
+{% block title %}
+User Registration - MOTI Engineering
+{% endblock %}
+
+{% block content %}
+<!-- Content Header (Page header) -->
+<section class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1>User Registration</h1>
+      </div>
+      <div class="col-sm-6">
+        <ol class="breadcrumb float-sm-right">
+          <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+          <li class="breadcrumb-item active">Registration</li>
+        </ol>
+      </div>
+    </div>
+  </div><!-- /.container-fluid -->
+</section>
+
+<!-- Main content -->
+<section class="content">
+  <div class="container-fluid">
+    <div class="row">
+      <!-- left column -->
+      <div class="col-md-12">
+        <!-- Registration Form -->
+        <div class="card card-primary">
+          <div class="card-header">
+            <h3 class="card-title">Register New User</h3>
+          </div>
+          <!-- /.card-header -->
+          <!-- form start -->
+          <form id="registrationForm" method="POST" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+            <div class="card-body">
+              <!-- Render Django form fields with Bootstrap styling -->
+              <div class="form-group">
+                {{ form.first_name.label_tag }}
+                {{ form.first_name }}
+                {% for error in form.first_name.errors %}
+                  <span class="invalid-feedback" role="alert">{{ error }}</span>
+                {% endfor %}
+              </div>
+
+              <div class="form-group">
+                {{ form.last_name.label_tag }}
+                {{ form.last_name }}
+                {% for error in form.last_name.errors %}
+                  <span class="invalid-feedback" role="alert">{{ error }}</span>
+                {% endfor %}
+              </div>
+
+              <div class="form-group">
+                {{ form.email.label_tag }}
+                {{ form.email }}
+                {% for error in form.email.errors %}
+                  <span class="invalid-feedback" role="alert">{{ error }}</span>
+                {% endfor %}
+              </div>
+
+              <div class="form-group">
+                {{ form.user_name.label_tag }}
+                {{ form.user_name }}
+                {% for error in form.user_name.errors %}
+                  <span class="invalid-feedback" role="alert">{{ error }}</span>
+                {% endfor %}
+              </div>
+
+              <div class="form-group">
+                {{ form.password.label_tag }}
+                {{ form.password }}
+                {% for error in form.password.errors %}
+                  <span class="invalid-feedback" role="alert">{{ error }}</span>
+                {% endfor %}
+              </div>
+
+              <div class="form-group">
+                {{ form.user_type.label_tag }}
+                {{ form.user_type }}
+                {% for error in form.user_type.errors %}
+                  <span class="invalid-feedback" role="alert">{{ error }}</span>
+                {% endfor %}
+              </div>
+
+              <div class="form-group">
+                {{ form.profile_picture.label_tag }}
+                {{ form.profile_picture }}
+                {% for error in form.profile_picture.errors %}
+                  <span class="invalid-feedback" role="alert">{{ error }}</span>
+                {% endfor %}
+              </div>
+            </div>
+            <!-- /.card-body -->
+            <div class="card-footer">
+              <button type="submit" class="btn btn-primary">Register</button>
+            </div>
+          </form>
+        </div>
+        <!-- /.card -->
+      </div>
+      <!--/.col (left) -->
+    </div>
+    <!-- /.row -->
+  </div><!-- /.container-fluid -->
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(function () {
+  $.validator.setDefaults({
+    submitHandler: function () {
+      alert("Registration successful!");
+    }
+  });
+
+  $('#registrationForm').validate({
+    rules: {
+      first_name: {
+        required: true
+      },
+      last_name: {
+        required: true
+      },
+      email: {
+        required: true,
+        email: true
+      },
+      user_name: {
+        required: true
+      },
+      password: {
+        required: true
+      },
+      user_type: {
+        required: true
+      }
+    },
+    messages: {
+      first_name: "Please enter your first name",
+      last_name: "Please enter your last name",
+      email: {
+        required: "Please enter your email",
+        email: "Please enter a valid email address"
+      },
+      user_name: "Please enter a username",
+      password: "Please enter a password",
+      user_type: "Please select a user type"
+    },
+    errorElement: 'span',
+    errorPlacement: function (error, element) {
+      error.addClass('invalid-feedback');
+      element.closest('.form-group').append(error);
+    },
+    highlight: function (element) {
+      $(element).addClass('is-invalid');
+    },
+    unhighlight: function (element) {
+      $(element).removeClass('is-invalid');
+    }
+  });
+});
+</script>
+{% endblock %}

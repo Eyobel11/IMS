@@ -1,0 +1,172 @@
+{% load static%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>User Registration - MOTI Engineering</title>
+
+  <!-- Google Font: Source Sans Pro -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="{% static 'plugins/fontawesome-free/css/all.min.css' %}">
+  <!-- icheck bootstrap -->
+  <link rel="stylesheet" href="{% static 'plugins/icheck-bootstrap/icheck-bootstrap.min.css' %}">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="{% static 'dist/css/adminlte.min.css' %}">
+</head>
+<body class="hold-transition register-page">
+  <div class="register-box">
+    <div class="register-logo">
+      <a href="{% url 'home' %}"><b>MOTI</b> Engineering</a>
+    </div>
+
+    <div class="card">
+      <div class="card-body register-card-body">
+        <p class="login-box-msg">Register a new membership</p>
+
+        <form id="registrationForm" action="{% url 'register' %}" method="POST" enctype="multipart/form-data" novalidate>
+          {% csrf_token %}
+          <div class="input-group mb-3">
+            {{ form.first_name.label_tag }}
+            {{ form.first_name }}
+            {% for error in form.first_name.errors %}
+              <span class="invalid-feedback d-block" role="alert">{{ error }}</span>
+            {% endfor %}
+          </div>
+
+          <div class="input-group mb-3">
+            {{ form.last_name.label_tag }}
+            {{ form.last_name }}
+            {% for error in form.last_name.errors %}
+              <span class="invalid-feedback d-block" role="alert">{{ error }}</span>
+            {% endfor %}
+          </div>
+
+          <div class="input-group mb-3">
+            {{ form.email.label_tag }}
+            {{ form.email }}
+            {% for error in form.email.errors %}
+              <span class="invalid-feedback d-block" role="alert">{{ error }}</span>
+            {% endfor %}
+          </div>
+
+          <div class="input-group mb-3">
+            {{ form.user_name.label_tag }}
+            {{ form.user_name }}
+            {% for error in form.user_name.errors %}
+              <span class="invalid-feedback d-block" role="alert">{{ error }}</span>
+            {% endfor %}
+          </div>
+
+          <div class="input-group mb-3">
+            {{ form.password.label_tag }}
+            {{ form.password }}
+            {% for error in form.password.errors %}
+              <span class="invalid-feedback d-block" role="alert">{{ error }}</span>
+            {% endfor %}
+          </div>
+
+          <div class="input-group mb-3">
+            {{ form.user_type.label_tag }}
+            {{ form.user_type }}
+            {% for error in form.user_type.errors %}
+              <span class="invalid-feedback d-block" role="alert">{{ error }}</span>
+            {% endfor %}
+          </div>
+
+         
+
+          <div class="row">
+            <div class="col-8">
+              <div class="icheck-primary">
+                <input type="checkbox" id="agreeTerms" name="terms" value="agree">
+                <label for="agreeTerms">
+                 I agree to the <a href="#">terms</a>
+                </label>
+              </div>
+            </div>
+            <!-- /.col -->
+            <div class="col-4">
+              <button type="submit" class="btn btn-primary btn-block">Register</button>
+            </div>
+            <!-- /.col -->
+          </div>
+        </form>
+
+       
+
+        <a href="{% url 'login' %}" class="text-center">I already have a membership</a>
+      </div>
+      <!-- /.form-box -->
+    </div><!-- /.card -->
+  </div>
+  <!-- /.register-box -->
+
+  <!-- jQuery -->
+  <script src="{% static 'plugins/jquery/jquery.min.js' %}"></script>
+  <!-- Bootstrap 4 -->
+  <script src="{% static 'plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <!-- AdminLTE App -->
+  <script src="{% static 'dist/js/adminlte.min.js' %}"></script>
+
+  {% block extra_js %}
+  <script>
+  $(function () {
+    $.validator.setDefaults({
+      submitHandler: function (form) {
+        // Perform AJAX form submission or any additional actions
+        form.submit(); // This will submit the form normally
+      }
+    });
+
+    $('#registrationForm').validate({
+      rules: {
+        first_name: {
+          required: true
+        },
+        last_name: {
+          required: true
+        },
+        email: {
+          required: true,
+          email: true
+        },
+        user_name: {
+          required: true
+        },
+        password: {
+          required: true
+        },
+        user_type: {
+          required: true
+        }
+      },
+      messages: {
+        first_name: "Please enter your first name",
+        last_name: "Please enter your last name",
+        email: {
+          required: "Please enter your email",
+          email: "Please enter a valid email address"
+        },
+        user_name: "Please enter a username",
+        password: "Please enter a password",
+        user_type: "Please select a user type"
+      },
+      errorElement: 'span',
+      errorPlacement: function (error, element) {
+        error.addClass('invalid-feedback');
+        element.closest('.input-group').append(error);
+      },
+      highlight: function (element) {
+        $(element).addClass('is-invalid');
+      },
+      unhighlight: function (element) {
+        $(element).removeClass('is-invalid');
+      }
+    });
+  });
+  </script>
+  {% endblock %}
+</body>
+</html>

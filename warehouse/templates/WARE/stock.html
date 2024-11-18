@@ -1,0 +1,138 @@
+{% extends "./navbar.html" %}
+{% load static %}
+
+{% block title %}
+Stock Form - MOTI Engineering
+{% endblock %}
+
+{% block content %}
+<!-- Content Header (Page header) -->
+<section class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1>Stock Form</h1>
+      </div>
+      <div class="col-sm-6">
+        <ol class="breadcrumb float-sm-right">
+          <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+          <li class="breadcrumb-item active">Stock</li>
+        </ol>
+      </div>
+    </div>
+  </div><!-- /.container-fluid -->
+</section>
+
+<!-- Main content -->
+<section class="content">
+  <div class="container-fluid">
+    <div class="row">
+      <!-- left column -->
+      <div class="col-md-12">
+        <!-- Stock Form -->
+        <div class="card card-primary">
+          <div class="card-header">
+            <h3 class="card-title">Add or Edit Stock</h3>
+          </div>
+          <!-- /.card-header -->
+          <!-- form start -->
+          <form id="stockForm" method="POST" novalidate>
+            {% csrf_token %}
+            <div class="card-body">
+              <!-- Render Django form fields with Bootstrap styling -->
+              <div class="form-group">
+                {{ form.current_level.label_tag }}
+                {{ form.current_level }}
+                {% for error in form.current_level.errors %}
+                  <span class="invalid-feedback" role="alert">{{ error }}</span>
+                {% endfor %}
+              </div>
+              
+              <div class="form-group">
+                {{ form.stock_no.label_tag }}
+                {{ form.stock_no }}
+                {% for error in form.stock_no.errors %}
+                  <span class="invalid-feedback" role="alert">{{ error }}</span>
+                {% endfor %}
+              </div>
+              
+              <div class="form-group">
+                {{ form.description.label_tag }}
+                {{ form.description }}
+                {% for error in form.description.errors %}
+                  <span class="invalid-feedback" role="alert">{{ error }}</span>
+                {% endfor %}
+              </div>
+              
+              <div class="form-group">
+                {{ form.category.label_tag }}
+                {{ form.category }}
+                {% for error in form.category.errors %}
+                  <span class="invalid-feedback" role="alert">{{ error }}</span>
+                {% endfor %}
+              </div>
+            </div>
+            <!-- /.card-body -->
+            <div class="card-footer">
+              <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+          </form>
+        </div>
+        <!-- /.card -->
+      </div>
+      <!--/.col (left) -->
+    </div>
+    <!-- /.row -->
+  </div><!-- /.container-fluid -->
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(function () {
+  $.validator.setDefaults({
+    submitHandler: function () {
+      alert("Form successfully submitted!");
+    }
+  });
+  
+  $('#stockForm').validate({
+    rules: {
+      current_level: {
+        required: true,
+        number: true
+      },
+      stock_no: {
+        required: true
+      },
+      description: {
+        required: false
+      },
+      category: {
+        required: true
+      }
+    },
+    messages: {
+      current_level: {
+        required: "Please enter the current stock level",
+        number: "Please enter a valid number"
+      },
+      stock_no: "Please enter the stock number",
+      description: "Optional description",
+      category: "Please select a category"
+    },
+    errorElement: 'span',
+    errorPlacement: function (error, element) {
+      error.addClass('invalid-feedback');
+      element.closest('.form-group').append(error);
+    },
+    highlight: function (element) {
+      $(element).addClass('is-invalid');
+    },
+    unhighlight: function (element) {
+      $(element).removeClass('is-invalid');
+    }
+  });
+});
+</script>
+{% endblock %}

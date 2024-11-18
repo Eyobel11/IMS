@@ -1,0 +1,32 @@
+{% extends './navbar.html' %}
+
+{% block title %}Delete User{% endblock %}
+
+{% block content %}
+<h1>Delete User</h1>
+<p>Are you sure you want to delete {{ user.username }}?</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Yes, Delete</button>
+    <a href="{% url 'user_list' %}" class="btn btn-secondary">Cancel</a>
+</form>
+
+{% if success %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            Swal.fire({
+                icon: 'success',
+                title: 'User Deleted successfully!',
+                showConfirmButton: true,
+                confirmButtonText: 'Okay'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "{% url 'user_list' %}";
+                }
+            });
+        });
+    </script>
+{% endif %}
+
+{% endblock %}

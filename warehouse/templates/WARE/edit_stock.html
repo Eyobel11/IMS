@@ -1,0 +1,40 @@
+{% extends "./navbar.html" %}
+{% load static %}
+{% load render_table from django_tables2 %}
+
+{% block content %}
+<div>
+        <a class="nav-link" href=' {% url "stocks" %} '>back</a>
+        </div>
+ 
+<div>
+    <main>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Save Edit</button>
+        </form>
+    </main>
+   
+       
+   
+</div>
+
+{% if success %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        Swal.fire({
+            icon: 'success',
+            title: 'Stocks updated successfully!',
+            showConfirmButton: true,
+            confirmButtonText: 'Okay'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "{% url 'stocks' %}";
+            }
+        });
+    });
+</script>
+{% endif %}
+
+{% endblock content %}  

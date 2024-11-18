@@ -1,6 +1,6 @@
 from django import forms
 from .models import Item, Order,Stock, Category,User,MaterialRequest
-from django.contrib.auth.forms import UserCreationForm,AuthenticationForm
+from django.contrib.auth.forms import UserCreationForm,AuthenticationForm,UserChangeForm
 
 class OrderForm(forms.ModelForm):
     class Meta:
@@ -38,14 +38,51 @@ class stockform(forms.ModelForm):
 
    
 class UserRegistrationForm(UserCreationForm):
+    first_name = forms.CharField(
+        max_length=200,
+        required=True,
+        help_text='Required.',
+        widget=forms.TextInput(attrs={'placeholder': 'First name'})
+    )
+    last_name = forms.CharField(
+        max_length=200,
+        required=True,
+        help_text='Required.',
+        widget=forms.TextInput(attrs={'placeholder': 'Last name'})
+    )
+    email = forms.EmailField(
+        max_length=254,
+        help_text='Required.',
+        widget=forms.EmailInput(attrs={'placeholder': 'Email'})
+    )
+    user_name = forms.CharField(
+        max_length=200,
+        required=True,
+        help_text='Required.',
+        widget=forms.TextInput(attrs={'placeholder': 'User name'})
+    )
+    password1 = forms.CharField(
+        label='Password',
+        widget=forms.PasswordInput(attrs={'placeholder': 'Password'})
+    )
+    password2 = forms.CharField(
+        label='Confirm Password',
+        widget=forms.PasswordInput(attrs={'placeholder': 'Retype password'})
+    )
+
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'user_name', 'email', 'user_type', 'password1', 'password2']
+        fields = ('first_name', 'last_name', 'email', 'user_name',  'password1', 'password2')
 
 class UserLoginForm(AuthenticationForm):
     class Meta:
         model = User
         fields = ['user_name', 'password']
+
+class UserEditForm(UserChangeForm):
+    class Meta:
+        model =User
+        fields = ['user_type']
         
 class materialrequestForm(forms.ModelForm):
     class Meta:

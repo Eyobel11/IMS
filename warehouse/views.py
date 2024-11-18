@@ -7,7 +7,7 @@ from .models import Item, Order, Stock, Category,Notification,User,MaterialReque
 from .forms import OrderForm, AddItemForm,catForm,stockform,EditmaterialrequestForm,materialrequestForm
 from django.db.models import Q
 from django.contrib.auth import login, authenticate, logout
-from .forms import UserRegistrationForm, UserLoginForm
+from .forms import UserRegistrationForm, UserLoginForm,UserEditForm
 from .decorators import admin_required, manager_required, staff_required
 from django.core.exceptions import PermissionDenied
 from django.views.decorators.csrf import csrf_exempt
@@ -15,13 +15,15 @@ from django.contrib.auth.decorators import login_required
 
 #home view
 
+@login_required
+
 def home(request):
     
-    templates = loader.get_template('warehouse/home.html')
+    templates = loader.get_template('WARE/home.html')
     return HttpResponse(templates.render({},request))
 
 def permission(request):
-       templates = loader.get_template('warehouse/403.html')
+       templates = loader.get_template('WARE/403.html')
        return HttpResponse(templates.render({},request))
 
 #item management views
@@ -36,33 +38,37 @@ def add_item(request):
             return redirect('items')  
           
     
-    return render(request, 'warehouse/item.html', {'form': AddItemForm()})  
+    return render(request, 'WARE/item.html', {'form': AddItemForm()})  
 
 @staff_required
 
 def item_edit(request, order_id):
     order = get_object_or_404(Item, pk=order_id)
+    success = False
     if request.method == 'POST':
         form = AddItemForm(request.POST, instance=order)  # Bind the form to the order instance
         if form.is_valid():
             form.save()
-            return redirect('items')  # Redirect to the orders list after saving
+            success = True
+            # return redirect('items')  # Redirect to the orders list after saving
     else:
         form = AddItemForm(instance=order)  # Load the form with the current order data
     
-    return render(request, 'warehouse/edit_item.html', {'form': form})
+    return render(request, 'WARE/edit_item.html', {'form': form,'success':success})
 
 @staff_required
 
 def item_delete(request,order_id):
      
      order = get_object_or_404(Item, id=order_id)  # Get the specific order by ID
-    
+     success = False
      if request.method == 'POST':
          order.delete()
-         return redirect('items')  # Redirect to the orders list after deletion
+         success = True
+
+        #  return redirect('items')  # Redirect to the orders list after deletion
      
-     return render(request, 'warehouse/delete_item.html', {'order': order})
+     return render(request, 'WARE/delete_item.html', {'order': order,'success':success})
 
 #order managment views
 
@@ -78,33 +84,35 @@ def order_item(request):
     else:
         form = OrderForm()
     
-    return render(request, 'warehouse/order.html', {'form': form})
+    return render(request, 'WARE/order.html', {'form': form})
 
 @manager_required
 
 def edit(request, order_id):
     order = get_object_or_404(Order, id=order_id)  # Get the specific order by ID
-    
+    success = False
     if request.method == 'POST':
         form = OrderForm(request.POST, instance=order)  # Bind the form to the order instance
         if form.is_valid():
             form.save()
-            return redirect('orders')  # Redirect to the orders list after saving
+            success = True
+            # return redirect('orders')  # Redirect to the orders list after saving
     else:
         form = OrderForm(instance=order)  # Load the form with the current order data
     
-    return render(request, 'warehouse/edit_order.html', {'form': form})
+    return render(request, 'WARE/edit_order.html', {'form': form, 'success':success})
 
 @manager_required
 
 def delete_order(request, order_id):
     order = get_object_or_404(Order, id=order_id)  # Get the specific order by ID
-    
+    success = False
     if request.method == 'POST':
         order.delete()
-        return redirect('orders')  # Redirect to the orders list after deletion
+        success = True
+        # return redirect('orders')  # Redirect to the orders list after deletion
     
-    return render(request, 'warehouse/delete_order.html', {'order': order})
+    return render(request, 'WARE/delete_order.html', {'order': order, 'success':success})
 
 
 #stock management views
@@ -119,35 +127,39 @@ def add_stock(request):
             form.save()
             return redirect('stocks') 
    
-    return render(request, 'warehouse/stock.html', {'form': stockform()})
+    return render(request, 'WARE/stock.html', {'form': stockform()})
 
 @manager_required
 
 def stock_edit(request,order_id):
 
     order = get_object_or_404(Stock, id=order_id)  # Get the specific order by ID
+    success = False
     
     if request.method == 'POST':
         form = stockform(request.POST, instance=order)  # Bind the form to the order instance
         if form.is_valid():
             form.save()
-            return redirect('stocks')  # Redirect to the orders list after saving
+            success = True
+            # return redirect('stocks')  # Redirect to the orders list after saving
     else:
         form = stockform(instance=order)  # Load the form with the current order data
     
-    return render(request, 'warehouse/edit_stock.html', {'form': form})
+    return render(request, 'WARE/edit_stock.html', {'form': form,'success':success})
 
 @manager_required
 
 def stock_delete(request,order_id):
     
      order = get_object_or_404(Stock, id=order_id)  # Get the specific order by ID
-    
+     success = False
+
      if request.method == 'POST':
         order.delete()
-        return redirect('stocks')  # Redirect to the orders list after deletion
+        success = True
+        # return redirect('stocks')  # Redirect to the orders list after deletion
     
-     return render(request, 'warehouse/delete_stock.html', {'order': order})
+     return render(request, 'WARE/delete_stock.html', {'order': order,'success':success})
 
     
 # category management views
@@ -162,41 +174,43 @@ def add_catagory(request):
             return redirect('cat')  
           
     
-    return render(request, 'warehouse/add_catagory.html', {'form': catForm()})  
+    return render(request, 'WARE/add_catagory.html', {'form': catForm()})  
 
 @manager_required
 
 def catagory_edit(request, order_id):
     
     order = get_object_or_404(Category, id=order_id)  # Get the specific order by ID
-    
+    success = False
     if request.method == 'POST':
         form = catForm(request.POST, instance=order)  # Bind the form to the order instance
         if form.is_valid():
             form.save()
-            return redirect('cat')  # Redirect to the orders list after saving
+            success = True
+            # return redirect('cat')  # Redirect to the orders list after saving
     else:
         form = catForm(instance=order)  # Load the form with the current order data
     
-    return render(request, 'warehouse/edit_catagory.html', {'form': form})
+    return render(request, 'WARE/edit_catagory.html', {'form': form,'success':success})
 
 @manager_required
 
 def delete_catagory(request,order_id):
 
      order = get_object_or_404(Category, id=order_id)  # Get the specific order by ID
-    
+     success= False
      if request.method == 'POST':
         order.delete()
-        return redirect('cat')  # Redirect to the orders list after deletion
+        success= True
+        # return redirect('cat')  # Redirect to the orders list after deletion
     
-     return render(request, 'warehouse/delete_catagory.html', {'order': order})
+     return render(request, 'WARE/delete_catagory.html', {'order': order,'success':success})
 
 # @login_required
 
 # def notification_list(request):
 #     notifications = request.user.notifications.filter(is_read=False).order_by('-created_at')
-#     return render(request, 'warehouse/notifications.html', {'notifications': notifications})
+#     return render(request, 'WARE/notifications.html', {'notifications': notifications})
 
 # # @login_required
 
@@ -215,7 +229,7 @@ def delete_catagory(request,order_id):
 class OrdersView(SingleTableView):
     model = Order
     table_class = ordertable
-    template_name = 'warehouse/orders.html'
+    template_name = 'WARE/orders.html'
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -231,7 +245,7 @@ class OrdersView(SingleTableView):
 class stocks(SingleTableView):
     model = Stock
     table_class = stocktable
-    template_name = 'warehouse/stocks.html'
+    template_name = 'WARE/stocks.html'
     
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -250,7 +264,7 @@ class stocks(SingleTableView):
 class itemView(SingleTableView):
     model = Item
     table_class = itemtable
-    template_name = 'warehouse/items.html'
+    template_name = 'WARE/items.html'
     
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -267,7 +281,7 @@ class itemView(SingleTableView):
 class catView(SingleTableView):
     model = Category
     table_class = cattable
-    template_name = 'warehouse/test.html'
+    template_name = 'WARE/test.html'
     
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -291,7 +305,7 @@ def register(request):
             return redirect('home')
     else:
         form = UserRegistrationForm()
-    return render(request, 'warehouse/register.html', {'form': form})
+    return render(request, 'WARE/register.html', {'form': form})
 
 def user_login(request):
     if request.method == 'POST':
@@ -302,7 +316,7 @@ def user_login(request):
             return redirect('home')
     else:
         form = UserLoginForm()
-    return render(request, 'warehouse/login.html', {'form': form})
+    return render(request, 'WARE/login.html', {'form': form})
 
 def user_logout(request):
     logout(request)
@@ -317,45 +331,48 @@ def user_logout(request):
 
 def user_list(request):
     users = User.objects.all()
-    return render(request, 'warehouse/user_list.html', {'users': users})
+    return render(request, 'WARE/user_list.html', {'users': users})
 
 @admin_required
 
-def user_add(request):
+# def user_add(request):
 
-    if request.method == 'POST':
-        form = UserRegistrationForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('user_list')
-    else:
-        form = UserRegistrationForm()
-    return render(request, 'warehouse/user_form.html', {'form': form, 'form_title': 'Add User'})
+#     if request.method == 'POST':
+#         form = UserRegistrationForm(request.POST)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('user_list')
+#     else:
+#         form = UserRegistrationForm()
+#     return render(request, 'WARE/user_form.html', {'form': form, 'form_title': 'Add User'})
 
 @admin_required
-
 def user_edit(request, id):
-    user = get_object_or_404(User, id=id)
+    user = get_object_or_404(User, id=id)  # Fetch the user to edit
+    success = False
     if request.method == 'POST':
-        form = UserRegistrationForm(request.POST, instance=user)
+        form = UserEditForm(request.POST, instance=user)  # Use UserEditForm
         if form.is_valid():
             form.save()
-            return redirect('user_list')
+            success = True  # Success flag
+            
         else:
             # Print errors to the console for debugging
             print(form.errors)
     else:
-        form = UserRegistrationForm(instance=user)
-    return render(request, 'warehouse/user_form.html', {'form': form, 'form_title': 'Edit User'})
+        form = UserEditForm(instance=user)  # Use UserEditForm for GET requests
+    return render(request, 'WARE/user_form.html', {'form': form, 'form_title': 'Edit User', 'success': success})
+
 
 @admin_required
 
 def user_delete(request, id):
     user = get_object_or_404(User, id=id)
+    success= False
     if request.method == 'POST':
         user.delete()
-        return redirect('user_list')
-    return render(request, 'warehouse/delete_user.html', {'user': user})
+        success = True # Success flag
+    return render(request, 'WARE/delete_user.html', {'user': user,'success': success})
 
 ################################ this is for the roles
 
@@ -426,7 +443,7 @@ def material_requests(request):
     else:
         form = materialrequestForm()
 
-    return render(request, 'warehouse/MaterialRequest.html', {'form': form})
+    return render(request, 'WARE/MaterialRequest.html', {'form': form})
 
 def MaterialRequests(request):
     if request.method == 'POST':
@@ -438,13 +455,13 @@ def MaterialRequests(request):
     else:
         form = materialrequestForm()
     
-    return render(request, 'warehouse/MaterialRequest.html', {'form': form})
+    return render(request, 'WARE/MaterialRequest.html', {'form': form})
 
 class MaterialRequestview(SingleTableView):
     
     model = MaterialRequest
     table_class = MaterialRequesttable
-    template_name = 'warehouse/material_request_list.html'
+    template_name = 'WARE/material_request_list.html'
 
     def get_queryset(self):
         return super().get_queryset().order_by('-request_date')
@@ -469,6 +486,6 @@ def editstatus(request, id):
         form = EditmaterialrequestForm(instance=material_request)
     
     # Render the template with the form
-    return render(request, 'warehouse/materialrequest.html', {'form': form})
+    return render(request, 'WARE/editrequest.html', {'form': form})
 
 

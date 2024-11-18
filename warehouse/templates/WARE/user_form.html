@@ -1,0 +1,44 @@
+
+
+{% extends './navbar.html' %}
+
+{% block title %}{{ form_title }}{% endblock %}
+
+{% block content %}
+<h1>{{ form_title }}</h1>
+<form method="post">
+    {% csrf_token %}
+
+
+    <div class="mb-3">
+        <label for="{{ form.user_type.id_for_label }}" class="form-label">Role</label>
+        {{ form.user_type }}
+        {% if form.user_type.errors %}
+            <div class="errorlist">{{ form.user_type.errors }}</div>
+        {% endif %}
+    </div>
+
+   
+
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a href="{% url 'user_list' %}" class="btn btn-secondary">Cancel</a>
+</form>
+
+{% if success %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            Swal.fire({
+                icon: 'success',
+                title: 'User updated successfully!',
+                showConfirmButton: true,
+                confirmButtonText: 'Okay'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "{% url 'user_list' %}";
+                }
+            });
+        });
+    </script>
+{% endif %}
+
+{% endblock %}
