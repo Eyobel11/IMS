@@ -91,14 +91,29 @@ WSGI_APPLICATION = 'IMS.wsgi.application'
 #     }
 # }
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'defaultdb',
+#         'USER': 'avnadmin',
+#         'PASSWORD': 'AVNS_wvWFsr284OzCVQmQj-1',
+#         'HOST': 'eyobel-eyobel1.i.aivencloud.com',
+#         'PORT': '20390',
+#         'OPTIONS': {
+#             'sslmode': 'require',
+#         },
+#     }
+# }
+
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'defaultdb',
-        'USER': 'avnadmin',
-        'PASSWORD': 'AVNS_wvWFsr284OzCVQmQj-1',
-        'HOST': 'eyobel-eyobel1.i.aivencloud.com',
-        'PORT': '20390',
+        'NAME': 'ims_oj1a',
+        'USER': 'ims_oj1a_user',
+        'PASSWORD': 'kohb0ZmrMsjvaKRJ9VJUvIlInXLpQJzi',
+        'HOST': 'dpg-csu78rq3esus73c8faf0-a.oregon-postgres.render.com',
+        'PORT': '5432',
         'OPTIONS': {
             'sslmode': 'require',
         },
