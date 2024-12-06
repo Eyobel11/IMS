@@ -66,4 +66,22 @@ Edit Material Request - MOTI Engineering
     <!-- /.row -->
   </div><!-- /.container-fluid -->
 </section>
+
+{% if success %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        Swal.fire({
+            icon: 'success',
+            title: 'Material request updated successfully!',
+            showConfirmButton: true,
+            confirmButtonText: 'Okay'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "{% url 'MaterialRequestview' %}";
+            }
+        });
+    });
+</script>
+{% endif %}
+
 {% endblock %}

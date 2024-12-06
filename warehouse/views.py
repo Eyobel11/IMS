@@ -473,19 +473,21 @@ class MaterialRequestview(SingleTableView):
 def editstatus(request, id):
     # Retrieve the material request object or return a 404 error if not found
     material_request = get_object_or_404(MaterialRequest, id=id)
-    
+    success = False
+
     if request.method == 'POST':
         # Initialize the form with POST data and the instance to be updated
         form = EditmaterialrequestForm(request.POST, instance=material_request)
         if form.is_valid():
             form.save()
             # Redirect to the material request list view or another relevant view
-            return redirect('MaterialRequestview')  # Ensure this URL name matches your URL pattern
+            success = True
+            # return redirect('MaterialRequestview')  # Ensure this URL name matches your URL pattern
     else:
         # Initialize the form with the instance to be edited for GET requests
         form = EditmaterialrequestForm(instance=material_request)
     
     # Render the template with the form
-    return render(request, 'WARE/editrequest.html', {'form': form})
+    return render(request, 'WARE/editrequest.html', {'form': form,'success': success})
 
 
