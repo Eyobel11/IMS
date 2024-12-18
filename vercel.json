@@ -4,7 +4,10 @@
       {
         "src": "IMS/wsgi.py",
         "use": "@vercel/python",
-        "config": { "maxLambdaSize": "15mb", "runtime": "python3.10" }
+        "config": {
+          "runtime": "python3.10",
+          "maxLambdaSize": "15mb"
+        }
       },
       {
         "src": "build_files.sh",
@@ -25,3 +28,4 @@
       }
     ]
   }
+  
