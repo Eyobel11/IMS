@@ -1,15 +1,5 @@
 #!/bin/bash
 #!/bin/bash
-set -e  # Exit immediately if a command exits with a non-zero status
-
-# Debugging: Check Python and pip versions
-
-
-
-python3 -m venv env
-source env/bin/activate
-pip install -r requirements.txt
-pip list --format=freeze
 
 
 echo "Python version:"
@@ -27,3 +17,12 @@ python3 -m pip install -r requirements.txt
 python3 manage.py collectstatic --noinput
 
 mkdir static
+
+#!/bin/bash
+set -e
+python3 -m venv env
+source env/bin/activate
+pip install -r requirements.txt
+mkdir -p staticfiles_build/static
+python3 manage.py collectstatic --noinput
+
