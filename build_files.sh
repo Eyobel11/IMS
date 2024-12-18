@@ -3,6 +3,15 @@
 set -e  # Exit immediately if a command exits with a non-zero status
 
 # Debugging: Check Python and pip versions
+
+
+
+python3 -m venv env
+source env/bin/activate
+pip install -r requirements.txt
+pip list --format=freeze
+
+
 echo "Python version:"
 python3 --version
 echo "Pip version:"
