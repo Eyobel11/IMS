@@ -24,6 +24,17 @@
       </div>
       <div class="card-body">
         <p class="login-box-msg">Sign in to start your session</p>
+
+        <!-- Note for testers -->
+          <!-- Note for testers -->
+                <div class="alert alert-light alert-dismissible fade show" role="alert" style="background-color: #f8f9fa;">
+                  <strong>Note for Testers:</strong> Use the following admin credentials to log in:<br>
+                  <strong>Username:</strong> eyobel<br>
+                  <strong>Password:</strong> hello@12
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
         
       <form id="loginForm"  method="POST" >
         {% csrf_token %}
