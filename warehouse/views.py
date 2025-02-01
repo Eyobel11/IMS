@@ -443,7 +443,7 @@ def material_requests(request):
     else:
         form = materialrequestForm()
 
-    return render(request, 'WARE/MaterialRequest.html', {'form': form})
+    return render(request, 'WARE/materialrequest.html', {'form': form})
 
 def MaterialRequests(request):
     if request.method == 'POST':
